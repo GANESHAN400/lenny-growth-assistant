@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.api.middleware import configure_cors
 from app.api.routers import health_router
 
 
@@ -17,5 +18,7 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+configure_cors(app)
 
 app.include_router(health_router)
