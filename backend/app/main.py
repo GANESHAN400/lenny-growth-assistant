@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.api.middleware import configure_cors, register_exception_handlers
-from app.api.routers import health_router
+from app.api.routers import api_router
 
 
 @asynccontextmanager
@@ -22,4 +22,4 @@ app = FastAPI(
 configure_cors(app)
 register_exception_handlers(app)
 
-app.include_router(health_router)
+app.include_router(api_router)
