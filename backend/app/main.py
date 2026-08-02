@@ -69,6 +69,15 @@ An AI-powered product growth strategy assistant backed by Lenny's podcast transc
     redoc_url="/redoc",
 )
 
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
+
 configure_cors(app)
 register_exception_handlers(app)
 app.include_router(api_router)
+
+# Mount frontend static directory
+frontend_dir = Path(__file__).resolve().parent.parent.parent / "frontend"
+if frontend_dir.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dir), html=True), name="frontend")
+

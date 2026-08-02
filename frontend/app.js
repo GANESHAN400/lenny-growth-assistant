@@ -87,6 +87,9 @@ async function loadSessions() {
 
 function renderSessions() {
   const container = document.getElementById('sessions-list');
+  const countBadge = document.getElementById('session-count-badge');
+  if (countBadge) countBadge.textContent = state.sessions.length;
+
   if (!state.sessions.length) {
     container.innerHTML = '<div class="sessions-empty">No chats yet. Start a new conversation!</div>';
     return;
@@ -549,6 +552,19 @@ function copyArtifact() {
     .catch(() => showToast('Copy failed', 'error'));
 }
 
+function downloadArtifact() {
+  if (!state.currentArtifact) return;
+  const ext = state.currentArtifactType === 'html' ? 'html' : 'md';
+  const blob = new Blob([state.currentArtifact], { type: ext === 'html' ? 'text/html' : 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lenny-growth-artifact.${ext}`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Artifact downloaded', 'success');
+}
+
 function openInNewTab() {
   if (!state.currentArtifact) return;
   const blob = new Blob([state.currentArtifact], { type: 'text/html' });
@@ -584,16 +600,25 @@ async function checkRagStatus() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// Markdown Renderer (Simple)
+// Markdown Renderer
 // ─────────────────────────────────────────────────────────────
 function renderMarkdown(text) {
   if (!text) return '';
   let html = escapeHtml(text);
 
-  // Code blocks
-  html = html.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, lang, code) =>
-    `<pre><code>${code.trim()}</code></pre>`
-  );
+  // Code blocks with Header & Copy button
+  html = html.replace(/```(\w+)?\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const language = lang || 'code';
+    return `<div class="code-block-wrapper">
+      <div class="code-header">
+        <span>${language}</span>
+        <button class="code-copy-btn" onclick="copyCodeSnippet(this)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy
+        </button>
+      </div>
+      <pre><code>${code.trim()}</code></pre>
+    </div>`;
+  });
 
   // Inline code
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
@@ -631,10 +656,10 @@ function renderMarkdown(text) {
 
   // Clean up empty paragraphs
   html = html.replace(/<p>\s*<\/p>/g, '');
+  html = html.replace(/<p>(<div class="code-block-wrapper">)/g, '$1');
+  html = html.replace(/(<\/div>)<\/p>/g, '$1');
   html = html.replace(/<p>(<h[1-6]>)/g, '$1');
   html = html.replace(/(<\/h[1-6]>)<\/p>/g, '$1');
-  html = html.replace(/<p>(<pre>)/g, '$1');
-  html = html.replace(/(<\/pre>)<\/p>/g, '$1');
   html = html.replace(/<p>(<ul>)/g, '$1');
   html = html.replace(/(<\/ul>)<\/p>/g, '$1');
   html = html.replace(/<p>(<blockquote>)/g, '$1');
@@ -642,6 +667,18 @@ function renderMarkdown(text) {
   html = html.replace(/<p>(<hr>)<\/p>/g, '$1');
 
   return html;
+}
+
+function copyCodeSnippet(btn) {
+  const wrapper = btn.closest('.code-block-wrapper');
+  const code = wrapper ? wrapper.querySelector('code').textContent : '';
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.innerHTML = `✓ Copied`;
+    setTimeout(() => {
+      btn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy`;
+    }, 2000);
+  });
 }
 
 // ─────────────────────────────────────────────────────────────

@@ -11,16 +11,29 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Ambient Glow Elements -->
+  <div class="ambient-bg">
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+  </div>
+
   <div id="app">
     <!-- Sidebar -->
     <aside id="sidebar" class="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <div class="logo-icon">L</div>
-          <span class="logo-text">Lenny</span>
+          <div class="logo-icon">
+            <span>L</span>
+            <div class="logo-sparkle"></div>
+          </div>
+          <div class="logo-title-group">
+            <span class="logo-text">Lenny Assistant</span>
+            <span class="logo-badge">PRO GROWTH</span>
+          </div>
         </div>
         <button id="new-chat-btn" class="btn-primary" onclick="newChat()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           New Chat
         </button>
       </div>
@@ -38,31 +51,37 @@
             Anthropic
           </button>
         </div>
-        <input id="model-input" type="text" class="input-field" placeholder="Model (e.g. qwen2.5:7b)" value="qwen2.5:7b" />
+        <div class="input-with-icon">
+          <svg class="field-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <input id="model-input" type="text" class="input-field" placeholder="Model (e.g. qwen2.5:7b)" value="qwen2.5:7b" />
+        </div>
       </div>
 
       <!-- Skills -->
       <div class="sidebar-section">
-        <label class="section-label">Active Skill</label>
+        <label class="section-label">Active Skill Mode</label>
         <div class="skill-selector">
           <button class="skill-btn active" id="skill-auto" onclick="setSkill(null)" title="Auto-detect skill from message">
-            🧠 Auto
+            <span>🧠</span> Auto
           </button>
           <button class="skill-btn" id="skill-qa" onclick="setSkill('qa')" title="Q&A from Lenny's transcripts">
-            🔍 Q&A
+            <span>🔍</span> Q&A
           </button>
           <button class="skill-btn" id="skill-ship30" onclick="setSkill('ship30')" title="Ship30for30 essay style">
-            ✍️ Ship30
+            <span>✍️</span> Ship30
           </button>
           <button class="skill-btn" id="skill-artifact" onclick="setSkill('artifact')" title="Generate HTML/Markdown artifacts">
-            🎨 Artifact
+            <span>🎨</span> Artifact
           </button>
         </div>
       </div>
 
       <!-- Sessions List -->
       <div class="sidebar-section flex-1">
-        <label class="section-label">Recent Chats</label>
+        <div class="section-header-row">
+          <label class="section-label">Recent Chats</label>
+          <span class="session-count-badge" id="session-count-badge">0</span>
+        </div>
         <div id="sessions-list" class="sessions-list">
           <div class="sessions-empty">No chats yet. Start a new conversation!</div>
         </div>
@@ -82,7 +101,7 @@
       <div class="chat-panel" id="chat-panel">
         <!-- Chat Header -->
         <header class="chat-header">
-          <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle">
+          <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle" title="Toggle Sidebar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
           </button>
           <div class="chat-title-area">
@@ -100,41 +119,58 @@
         <div class="messages-container" id="messages-container">
           <!-- Welcome Screen -->
           <div id="welcome-screen" class="welcome-screen">
-            <div class="welcome-logo">L</div>
+            <div class="welcome-badge">
+              <span class="pulse-icon">⚡</span> 7,390+ Knowledge Chunks Indexed
+            </div>
+            <div class="welcome-logo">
+              <span class="logo-letter">L</span>
+              <div class="logo-glow"></div>
+            </div>
             <h2 class="welcome-title">Ask Lenny Anything</h2>
-            <p class="welcome-subtitle">Powered by 57+ episodes of Lenny's Podcast transcripts</p>
+            <p class="welcome-subtitle">AI Growth Advisor powered by 57+ episodes of Lenny's Podcast transcripts</p>
             <div class="starter-prompts">
               <button class="starter-card" onclick="sendStarterPrompt('What are the most important growth loops? Give me specific examples from the transcripts.')">
-                <div class="starter-icon">🔄</div>
+                <div class="starter-icon-wrap icon-blue">🔄</div>
                 <div class="starter-text">
                   <strong>Growth Loops</strong>
-                  <span>What are the most effective growth loops?</span>
+                  <span>What are the most effective acquisition & retention loops?</span>
                 </div>
+                <div class="starter-arrow">→</div>
               </button>
               <button class="starter-card" onclick="sendStarterPrompt('Write a Ship30for30 essay on why most startups get user activation wrong, using insights from Lenny\'s podcast.')">
-                <div class="starter-icon">✍️</div>
+                <div class="starter-icon-wrap icon-purple">✍️</div>
                 <div class="starter-text">
                   <strong>Ship30 Essay</strong>
-                  <span>Write an essay on activation mistakes</span>
+                  <span>Write an essay on user activation mistakes</span>
                 </div>
+                <div class="starter-arrow">→</div>
               </button>
               <button class="starter-card" onclick="sendStarterPrompt('Generate an HTML dashboard showing a product growth metrics template with AARRR funnel metrics, styled beautifully.')">
-                <div class="starter-icon">🎨</div>
+                <div class="starter-icon-wrap icon-cyan">🎨</div>
                 <div class="starter-text">
                   <strong>Growth Dashboard</strong>
-                  <span>Generate an AARRR metrics dashboard</span>
+                  <span>Generate an interactive AARRR funnel dashboard</span>
                 </div>
+                <div class="starter-arrow">→</div>
               </button>
               <button class="starter-card" onclick="sendStarterPrompt('What did Brian Chesky or other successful founders say about product-market fit? Quote specific insights.')">
-                <div class="starter-icon">🎯</div>
+                <div class="starter-icon-wrap icon-emerald">🎯</div>
                 <div class="starter-text">
-                  <strong>PMF Insights</strong>
-                  <span>What founders say about product-market fit</span>
+                  <strong>PMF Benchmarks</strong>
+                  <span>Founder advice on knowing when you hit PMF</span>
                 </div>
+                <div class="starter-arrow">→</div>
               </button>
             </div>
           </div>
           <div id="messages" class="messages"></div>
+        </div>
+
+        <!-- Prompt Suggestions Bar -->
+        <div class="quick-prompts-bar" id="quick-prompts-bar">
+          <button class="prompt-chip" onclick="sendStarterPrompt('Synthesize top 5 pricing strategy takeaways from podcast guests.')">💡 Pricing Strategy</button>
+          <button class="prompt-chip" onclick="sendStarterPrompt('Generate a product launch checklist artifact in HTML.')">🚀 Launch Checklist</button>
+          <button class="prompt-chip" onclick="sendStarterPrompt('Write a Ship30 essay about North Star Metric selection.')">📊 North Star Essay</button>
         </div>
 
         <!-- Input Area -->
@@ -148,7 +184,7 @@
               onkeydown="handleKeyDown(event)"
               oninput="autoResize(this)"
             ></textarea>
-            <button id="send-btn" class="send-btn" onclick="sendMessage()" disabled>
+            <button id="send-btn" class="send-btn" onclick="sendMessage()" disabled title="Send message">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="22" y1="2" x2="11" y2="13"/>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -176,6 +212,9 @@
           <div class="artifact-actions">
             <button class="btn-icon-sm" onclick="copyArtifact()" title="Copy source">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="btn-icon-sm" onclick="downloadArtifact()" title="Download artifact">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
             <button class="btn-icon-sm" onclick="openInNewTab()" title="Open in new tab" id="open-tab-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
