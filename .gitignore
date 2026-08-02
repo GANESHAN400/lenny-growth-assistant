@@ -1,0 +1,82 @@
+# ====================
+# Environment & Secrets
+# ====================
+.env
+.env.local
+.env.*.local
+*.env
+
+# ====================
+# Python
+# ====================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+wheels/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# ====================
+# Database Files
+# ====================
+*.db
+*.sqlite
+*.sqlite3
+
+# ====================
+# IDE & Editor
+# ====================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ====================
+# Logs
+# ====================
+*.log
+logs/
+
+# ====================
+# Test & Coverage
+# ====================
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+
+# ====================
+# Node / Frontend
+# ====================
+node_modules/
+.next/
+dist/
+.cache/
+
+# ====================
+# Misc
+# ====================
+*.bak
+*.tmp

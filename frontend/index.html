@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lenny Growth Assistant — AI-Powered Product Growth Advisor</title>
+  <meta name="description" content="Ask Lenny anything about product growth, get Ship30for30 essays, and generate beautiful artifacts — powered by Lenny's podcast transcripts." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">L</div>
+          <span class="logo-text">Lenny</span>
+        </div>
+        <button id="new-chat-btn" class="btn-primary" onclick="newChat()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Chat
+        </button>
+      </div>
+
+      <!-- Provider Settings -->
+      <div class="sidebar-section">
+        <label class="section-label">LLM Provider</label>
+        <div class="provider-selector">
+          <button class="provider-btn active" id="provider-ollama" onclick="setProvider('ollama')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            Ollama (Local)
+          </button>
+          <button class="provider-btn" id="provider-anthropic" onclick="setProvider('anthropic')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 19h20L12 2z"/></svg>
+            Anthropic
+          </button>
+        </div>
+        <input id="model-input" type="text" class="input-field" placeholder="Model (e.g. qwen2.5:7b)" value="qwen2.5:7b" />
+      </div>
+
+      <!-- Skills -->
+      <div class="sidebar-section">
+        <label class="section-label">Active Skill</label>
+        <div class="skill-selector">
+          <button class="skill-btn active" id="skill-auto" onclick="setSkill(null)" title="Auto-detect skill from message">
+            🧠 Auto
+          </button>
+          <button class="skill-btn" id="skill-qa" onclick="setSkill('qa')" title="Q&A from Lenny's transcripts">
+            🔍 Q&A
+          </button>
+          <button class="skill-btn" id="skill-ship30" onclick="setSkill('ship30')" title="Ship30for30 essay style">
+            ✍️ Ship30
+          </button>
+          <button class="skill-btn" id="skill-artifact" onclick="setSkill('artifact')" title="Generate HTML/Markdown artifacts">
+            🎨 Artifact
+          </button>
+        </div>
+      </div>
+
+      <!-- Sessions List -->
+      <div class="sidebar-section flex-1">
+        <label class="section-label">Recent Chats</label>
+        <div id="sessions-list" class="sessions-list">
+          <div class="sessions-empty">No chats yet. Start a new conversation!</div>
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="rag-status" id="rag-status">
+          <div class="status-dot"></div>
+          <span>Checking RAG...</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="main-content">
+      <!-- Chat Panel -->
+      <div class="chat-panel" id="chat-panel">
+        <!-- Chat Header -->
+        <header class="chat-header">
+          <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="chat-title-area">
+            <h1 id="chat-title" class="chat-title">Lenny Growth Assistant</h1>
+            <div id="skill-badge" class="skill-badge" style="display:none"></div>
+          </div>
+          <div class="header-actions">
+            <button class="btn-icon" onclick="clearArtifact()" title="Clear artifact" id="clear-artifact-btn" style="display:none">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Messages Area -->
+        <div class="messages-container" id="messages-container">
+          <!-- Welcome Screen -->
+          <div id="welcome-screen" class="welcome-screen">
+            <div class="welcome-logo">L</div>
+            <h2 class="welcome-title">Ask Lenny Anything</h2>
+            <p class="welcome-subtitle">Powered by 57+ episodes of Lenny's Podcast transcripts</p>
+            <div class="starter-prompts">
+              <button class="starter-card" onclick="sendStarterPrompt('What are the most important growth loops? Give me specific examples from the transcripts.')">
+                <div class="starter-icon">🔄</div>
+                <div class="starter-text">
+                  <strong>Growth Loops</strong>
+                  <span>What are the most effective growth loops?</span>
+                </div>
+              </button>
+              <button class="starter-card" onclick="sendStarterPrompt('Write a Ship30for30 essay on why most startups get user activation wrong, using insights from Lenny\'s podcast.')">
+                <div class="starter-icon">✍️</div>
+                <div class="starter-text">
+                  <strong>Ship30 Essay</strong>
+                  <span>Write an essay on activation mistakes</span>
+                </div>
+              </button>
+              <button class="starter-card" onclick="sendStarterPrompt('Generate an HTML dashboard showing a product growth metrics template with AARRR funnel metrics, styled beautifully.')">
+                <div class="starter-icon">🎨</div>
+                <div class="starter-text">
+                  <strong>Growth Dashboard</strong>
+                  <span>Generate an AARRR metrics dashboard</span>
+                </div>
+              </button>
+              <button class="starter-card" onclick="sendStarterPrompt('What did Brian Chesky or other successful founders say about product-market fit? Quote specific insights.')">
+                <div class="starter-icon">🎯</div>
+                <div class="starter-text">
+                  <strong>PMF Insights</strong>
+                  <span>What founders say about product-market fit</span>
+                </div>
+              </button>
+            </div>
+          </div>
+          <div id="messages" class="messages"></div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+          <div class="input-wrapper">
+            <textarea
+              id="message-input"
+              class="message-input"
+              placeholder="Ask about growth strategy, request a Ship30 essay, or generate an artifact..."
+              rows="1"
+              onkeydown="handleKeyDown(event)"
+              oninput="autoResize(this)"
+            ></textarea>
+            <button id="send-btn" class="send-btn" onclick="sendMessage()" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+          <div class="input-footer">
+            <span id="current-skill-label" class="current-skill">🧠 Auto-detecting skill</span>
+            <span class="input-hint">Enter to send · Shift+Enter for new line</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Artifact Panel -->
+      <div class="artifact-panel" id="artifact-panel" style="display:none">
+        <div class="artifact-header">
+          <div class="artifact-title-row">
+            <div class="artifact-icon" id="artifact-icon">📄</div>
+            <span class="artifact-label" id="artifact-label">Artifact</span>
+            <div class="artifact-tabs">
+              <button class="artifact-tab active" id="tab-preview" onclick="switchArtifactTab('preview')">Preview</button>
+              <button class="artifact-tab" id="tab-source" onclick="switchArtifactTab('source')">Source</button>
+            </div>
+          </div>
+          <div class="artifact-actions">
+            <button class="btn-icon-sm" onclick="copyArtifact()" title="Copy source">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+            <button class="btn-icon-sm" onclick="openInNewTab()" title="Open in new tab" id="open-tab-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            </button>
+            <button class="btn-icon-sm" onclick="clearArtifact()" title="Close artifact">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="artifact-content" id="artifact-content">
+          <iframe id="artifact-iframe" class="artifact-iframe" sandbox="allow-scripts allow-same-origin" title="Artifact Preview"></iframe>
+          <div id="artifact-markdown" class="artifact-markdown" style="display:none"></div>
+          <pre id="artifact-source" class="artifact-source" style="display:none"><code id="artifact-code"></code></pre>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
